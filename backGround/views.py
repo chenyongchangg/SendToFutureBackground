@@ -8,14 +8,16 @@ import time
 import threading
 
 
+
 # Create your views here.
 
 
 def add(request):
     dto = models.Dto()
-    dto.content = request.GET['content']
+
     dto. email = request.GET['email']
     dto.date = request.GET['date']
+    dto.content = request.GET['content']
     dto.isPublic = request.GET['isPublic']
     dto.save()
     return  HttpResponse('你的信笺正通过时光隧道向你的未来飞去')
@@ -51,11 +53,13 @@ def send():
         book = models.Dto.objects.all()
         for item in book:
             if item.date.strftime('%Y-%m-%d')<time.strftime('%Y-%m-%d', time.localtime(time.time())) and item.isSend == False :
+                send_mail('还记得曾经的信吗?', item.content,
+                          'chenyongchangg@126.com',
+                          [item.email], fail_silently=False)
+
+                print(item.isSend)
                 item.isSend = True
                 item.save()
-                send_mail('还记得曾经的信吗？', item.content,
-                          item.email, fail_silently=False)
-                print(item.isSend)
 
 
 thread = threading.Thread(target=send)
